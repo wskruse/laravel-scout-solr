@@ -67,6 +67,27 @@ class Builder extends ScoutBuilder
     private $start = null;
 
     /**
+     * Determine whether we want the spellcheck component to run
+     *
+     * @var boolean
+     */
+    private $useSpellcheck = false;
+
+    /**
+     * If the search returns a collation for spellcheck, automatically re-run it to extend the results
+     *
+     * @var boolean
+     */
+    private $doAutoSpellcheckSearch = false;
+
+    /**
+     * Options for the spellcheck component
+     *
+     * @var array
+     */
+    private $spellcheckOptions = [];
+
+    /**
      * Add a simple key=value filter.
      *
      * @param string|Closure|array $field The field to compare against
@@ -335,5 +356,51 @@ class Builder extends ScoutBuilder
     public function getStart(): ?int
     {
         return $this->start;
+    }
+
+    /**
+     * Enable the spellcheck component
+     *
+     * @param array $options Spellcheck options
+     * @return self
+     */
+    public function spellcheck($options = []): self
+    {
+        $this->useSpellcheck = true;
+        $this->spellcheckOptions = $options;
+        return $this;
+    }
+
+    /**
+     * Determine whether this search wants the spellcheck component
+     *
+     * @return boolean
+     */
+    public function getUseSpellcheck(): bool
+    {
+        return $this->useSpellcheck;
+    }
+
+    /**
+     * If enabled will automatically re-search the index for any collated searches returned by the spellcheck component
+     *
+     * @return self
+     */
+    public function autoSpellcheckSearch(): self
+    {
+        $this->doAutoSpellcheckSearch = true;
+        // force collation to make sure we get alternate results back
+        $this->spellcheckOptions['collate'] = true;
+        return $this;
+    }
+
+    /**
+     * Define if we want to perform an auto re-search
+     *
+     * @return boolean
+     */
+    public function getDoAutoSpellcheckSearch(): bool
+    {
+        return $this->doAutoSpellcheckSearch;
     }
 }
